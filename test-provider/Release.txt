@@ -1,0 +1,5 @@
+Wayside Test Provider camera database
+
+Version 1.002 (24 Sep 2026)
+
+Invented positions for testing Wayside. These are not real cameras.
