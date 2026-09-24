@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>Wayside Test Provider releases</title>
+  <link>https://getwayside.app/test-provider/</link>
+  <description>Release announcements for the Wayside test camera database.</description>
+  <item>
+    <title>Wayside Test cameras 1.003 released 24 Sep 2026</title>
+    <link>https://getwayside.app/test-provider/</link>
+    <description>One camera moved. This release is newer than the database in the ZIP, so an import of 1.002 is told an update is available.</description>
+  </item>
+  <item>
+    <title>Wayside Test cameras 1.002 released 17 Sep 2026</title>
+    <link>https://getwayside.app/test-provider/</link>
+    <description>The release the downloadable ZIP contains.</description>
+  </item>
+</channel>
+</rss>

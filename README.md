@@ -9,6 +9,7 @@ privacy/          the privacy policy, linked from About and from App Store Conne
 support/          the support page, linked from About
 style.css         shared, light and dark
 icon.png          the app icon at 256px
+test-provider/    a pretend camera database and release feed that debug builds import to test a second provider
 ```
 
 ## Publishing
