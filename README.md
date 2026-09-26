@@ -10,6 +10,7 @@ support/          the support page, linked from About
 style.css         shared, light and dark
 icon.png          the app icon at 256px
 test-provider/    a pretend camera database and release feed that debug builds import to test a second provider
+community-db/     the community camera database the app downloads, rebuilt weekly by the workflow in .github/
 ```
 
 ## Publishing
@@ -19,6 +20,39 @@ GitHub Pages only serves from a public repository on a free plan. They are publi
 [waysideapp/website](https://github.com/waysideapp/website): copy this directory into it, then
 Settings → Pages → Deploy from a branch → `main` → `/ (root)`. That repository's issues are also
 the support channel the support page points at.
+
+Copy the dot-directory too, since the workflow lives there:
+
+```bash
+cp -R site/. ../website/
+```
+
+The copy overwrites what is in both places and leaves the rest alone, so the database files
+the workflow commits over there survive it.
+
+## The community database
+
+`community-db/build.py` fetches Lufop.net's EU archive, keeps the GB files, and writes
+`gb-cameras.zip` and `manifest.json` beside itself. `.github/workflows/community-db.yml`
+runs it every Sunday at 06:30 UTC and commits the result, and the app fetches the ZIP from
+`https://getwayside.app/community-db/gb-cameras.zip` (the URL is `LufopSource.releaseURL`).
+Neither output file is kept in this repository: they are produced in the website repository
+only, by the workflow.
+
+- **After the first copy**, run the workflow by hand (Actions → Community database → Run
+  workflow). Until it has run once the app's download returns 404, which it treats as a
+  failed weekly refresh and keeps the cameras it has.
+- **A failed run leaves the last files in place.** The script refuses to publish fewer than
+  4,000 cameras, or a dataset with no red-light or no fixed cameras, and stops if lufop.net
+  answers with its Cloudflare challenge instead of the ZIP. GitHub's runners have been let
+  through with a plain `curl`; most other networks are not, so the script cannot be tested
+  against lufop.net from a laptop. Test it with `--source` and a copy of the archive instead.
+- **The schedule needs commits.** GitHub disables a public repository's scheduled workflows
+  after 60 days without activity, which is why the manifest's `checkedAt` changes on every
+  run and every run commits.
+- **Only fixed and red-light files are read.** Lufop's GB set has nothing else today; a
+  section (`Troncondebut`) or tunnel file that appeared would be listed under `ignoredFiles`
+  in the manifest rather than published as a fixed camera.
 
 ## The domain
 

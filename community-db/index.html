@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wayside Community Database</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Wayside Community Database</h1>
+<p>The camera database Wayside downloads when no other database has been imported. It covers fixed speed cameras and red-light cameras in Great Britain, and is rebuilt every Sunday from the data published by <a href="https://lufop.net">Lufop.net</a> under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+<h2>Files</h2>
+<ul>
+<li><a href="gb-cameras.zip">gb-cameras.zip</a> — the database the app downloads. One CSV, <code>gb-cameras.csv</code>, with a row per camera: longitude, latitude, the rule (<code>max @30</code> or <code>stop</code>) and Lufop's description.</li>
+<li><a href="manifest.json">manifest.json</a> — when the data was published by Lufop, when it was last checked, and how many cameras of each kind it holds.</li>
+</ul>
+<p>Mobile camera sites and average speed cameras are not included. Corrections to the positions themselves go to Lufop.net, whose data this is. The build script is <a href="build.py">build.py</a>.</p>
+</main>
+</body>
+</html>
