@@ -42,11 +42,19 @@ only, by the workflow.
 - **After the first copy**, run the workflow by hand (Actions → Community database → Run
   workflow). Until it has run once the app's download returns 404, which it treats as a
   failed weekly refresh and keeps the cameras it has.
+- **lufop.net refuses GitHub's runners.** Its Cloudflare front has answered them with 403
+  since September 2026, which is also why the Open-GATSO-POI build stopped. The workflow
+  still tries the download first, and when it fails builds from
+  `community-db/source/lufop-eu.zip`, a copy of the archive committed here by hand. The
+  manifest's `fetched` says which happened. To refresh the copy, download
+  `Lufop-Zones-de-danger-EU-CSV.zip` from
+  [lufop.net's download page](https://lufop.net/zones-de-danger-france-et-europe-asc-et-csv/)
+  in a browser, save it over that path, commit it and run the workflow. The data is
+  CC BY-SA 4.0, so keeping the copy here is allowed. Without a copy, a refused download
+  fails the run and the published files stay as they were.
 - **A failed run leaves the last files in place.** The script refuses to publish fewer than
-  4,000 cameras, or a dataset with no red-light or no fixed cameras, and stops if lufop.net
-  answers with its Cloudflare challenge instead of the ZIP. GitHub's runners have been let
-  through with a plain `curl`; most other networks are not, so the script cannot be tested
-  against lufop.net from a laptop. Test it with `--source` and a copy of the archive instead.
+  4,000 cameras, or a dataset with no red-light or no fixed cameras. It cannot be tested
+  against lufop.net from a laptop either; test it with `--source` and a copy of the archive.
 - **The schedule needs commits.** GitHub disables a public repository's scheduled workflows
   after 60 days without activity, which is why the manifest's `checkedAt` changes on every
   run and every run commits.

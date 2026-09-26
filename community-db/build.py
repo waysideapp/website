@@ -5,8 +5,9 @@ Reads the GB files out of Lufop-Zones-de-danger-EU-CSV.zip and writes, beside th
 script, gb-cameras.zip (one CSV in the lon,lat,rule,description shape the app's
 LufopParser reads) and manifest.json. Standard library only.
 
-    python3 build.py                      fetch from lufop.net and build
-    python3 build.py --source file.zip    build from a copy already on disk
+    python3 build.py                        fetch from lufop.net and build
+    python3 build.py --source file.zip      build from a copy already on disk
+    python3 build.py --fallback file.zip    fetch, and build from the copy if lufop.net refuses
 """
 
 import argparse
@@ -36,8 +37,8 @@ ROW_PATTERN = re.compile(r"^(-?\d*(?:\.\d*)?)\s*,\s*(-?\d*(?:\.\d*)?)\s*,\s*(.*)
 
 
 def fetch(url, destination):
-    # lufop.net sits behind Cloudflare, which lets a plain curl through from GitHub's runners
-    # but not from every network; the same user agent Open-GATSO-POI's build uses.
+    # lufop.net sits behind Cloudflare, which has refused GitHub's runners since September 2026;
+    # the request is the one Open-GATSO-POI's build makes, in case that changes back.
     command = [
         "curl", "-fsSL", "--retry", "3", "--retry-delay", "5", "--retry-all-errors",
         "--max-time", "300", "--max-filesize", str(MAX_SOURCE_BYTES),
@@ -115,20 +116,31 @@ def read_rows(archive, country):
     return sorted(rows), files, ignored, newest
 
 
-def build(source, out_dir, country, minimum):
+def build(source, fallback, out_dir, country, minimum):
     checked_at = datetime.now(timezone.utc).replace(microsecond=0)
+    fetched = False
+    data_date = None
     with tempfile.TemporaryDirectory() as workspace:
+        path = source
         if re.match(r"^https?://", source):
             path = os.path.join(workspace, "source.zip")
-            data_date = fetch(source, path)
-        else:
-            path = source
-            data_date = datetime.fromtimestamp(os.path.getmtime(path), timezone.utc)
+            try:
+                data_date = fetch(source, path)
+                if not zipfile.is_zipfile(path):
+                    raise RuntimeError("lufop.net answered with something other than a ZIP, probably its bot challenge")
+                fetched = True
+            except (subprocess.CalledProcessError, RuntimeError, OSError) as error:
+                if not (fallback and os.path.isfile(fallback)):
+                    sys.exit(f"Could not fetch {source} ({error}) and there is no copy to fall back on.")
+                print(f"Could not fetch {source} ({error}); building from {fallback} instead.")
+                path = fallback
+                data_date = None
         if not zipfile.is_zipfile(path):
-            sys.exit(f"{source} is not a ZIP archive. lufop.net may have answered with its bot challenge instead of the file.")
+            sys.exit(f"{path} is not a ZIP archive.")
         with zipfile.ZipFile(path) as archive:
             rows, files, ignored, newest_entry = read_rows(archive, country)
 
+    # A copy on disk has whatever mtime the checkout gave it; Lufop's own entry dates are the data date.
     if data_date is None:
         data_date = newest_entry or checked_at
     data_date = data_date.replace(microsecond=0)
@@ -165,7 +177,8 @@ def build(source, out_dir, country, minimum):
         "files": files,
         "ignoredFiles": ignored,
         "sha256": hashlib.sha256(csv_bytes).hexdigest(),
-        "source": source if re.match(r"^https?://", source) else SOURCE_URL,
+        "source": SOURCE_URL,
+        "fetched": fetched,
         "attribution": "© Lufop.net, CC BY-SA 4.0",
     }
 
@@ -179,6 +192,7 @@ def build(source, out_dir, country, minimum):
     summary = (
         f"| | |\n|---|---|\n| Data date | {manifest['dataDate']} |\n| Cameras | {len(rows)} |\n"
         f"| Fixed speed | {fixed} |\n| Red light | {red_light} |\n| Files | {', '.join(f['name'] for f in files)} |\n"
+        f"| Source | {'fetched from lufop.net' if fetched else 'the copy in the repository'} |\n"
     )
     if ignored:
         summary += f"| Ignored | {', '.join(ignored)} |\n"
@@ -192,11 +206,12 @@ def build(source, out_dir, country, minimum):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--source", default=SOURCE_URL, help="URL or path of Lufop's EU archive")
+    parser.add_argument("--fallback", help="a copy of the archive to build from when the URL cannot be fetched")
     parser.add_argument("--out", default=os.path.dirname(os.path.abspath(__file__)), help="directory to write into")
     parser.add_argument("--country", default="GB", help="two-letter country code of the files to keep")
     parser.add_argument("--min-cameras", type=int, default=4000, help="refuse to publish fewer cameras than this")
     args = parser.parse_args()
-    build(args.source, args.out, args.country.upper(), args.min_cameras)
+    build(args.source, args.fallback, args.out, args.country.upper(), args.min_cameras)
 
 
 if __name__ == "__main__":
