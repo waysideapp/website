@@ -9,39 +9,29 @@ privacy/          the privacy policy, linked from About and from App Store Conne
 support/          the support page, linked from About
 style.css         shared, light and dark
 icon.png          the app icon at 256px
-test-provider/    a pretend camera database and release feed that debug builds import to test a second provider
+test-provider/    a pretend camera database and release feed that debug builds import to test a second provider;
+                  the app's package tests keep a copy under Fixtures/test-provider, so change both
 community-db/     the community camera database the app downloads, rebuilt weekly by the workflow in .github/
 ```
 
 ## Publishing
 
-The app's own repository is private, so these pages live in a **separate public repository** —
-GitHub Pages only serves from a public repository on a free plan. They are published from
-[waysideapp/website](https://github.com/waysideapp/website): copy this directory into it, then
-Settings → Pages → Deploy from a branch → `main` → `/ (root)`. That repository's issues are also
-the support channel the support page points at.
-
-Copy the dot-directory too, since the workflow lives there:
-
-```bash
-cp -R site/. ../website/
-```
-
-The copy overwrites what is in both places and leaves the rest alone, so the database files
-the workflow commits over there survive it.
+This repository is the site. GitHub Pages serves `main` from `/ (root)` (Settings → Pages →
+Deploy from a branch), and a merge to `main` is live within about a minute. The app's own
+repository is private and holds no copy of these pages; it links here. This repository's
+issues are also the support channel the support page points at.
 
 ## The community database
 
 `community-db/build.py` fetches Lufop.net's EU archive, keeps the GB files, and writes
 `gb-cameras.zip` and `manifest.json` beside itself. `.github/workflows/community-db.yml`
 runs it every Sunday at 06:30 UTC and commits the result, and the app fetches the ZIP from
-`https://getwayside.app/community-db/gb-cameras.zip` (the URL is `LufopSource.releaseURL`).
-Neither output file is kept in this repository: they are produced in the website repository
-only, by the workflow.
+`https://getwayside.app/community-db/gb-cameras.zip` (the URL is `LufopSource.releaseURL` in
+the app). Both output files are committed here by the workflow alone; do not edit them.
 
-- **After the first copy**, run the workflow by hand (Actions → Community database → Run
-  workflow). Until it has run once the app's download returns 404, which it treats as a
-  failed weekly refresh and keeps the cameras it has.
+- **To run it by hand**, use Actions → Community database → Run workflow. A missing file
+  returns 404 to the app, which treats it as a failed weekly refresh and keeps the cameras
+  it has.
 - **lufop.net refuses GitHub's runners.** Its Cloudflare front has answered them with 403
   since September 2026, which is also why the Open-GATSO-POI build stopped. The workflow
   still tries the download first, and when it fails builds from
