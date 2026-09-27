@@ -46,12 +46,14 @@ only, by the workflow.
   since September 2026, which is also why the Open-GATSO-POI build stopped. The workflow
   still tries the download first, and when it fails builds from
   `community-db/source/lufop-eu.zip`, a copy of the archive committed here by hand. The
-  manifest's `fetched` says which happened. To refresh the copy, download
+  manifest's `fetched` says which happened. To refresh the copy, sign in to lufop.net (a
+  free account is required for the download, and an ad blocker hides the link), download
   `Lufop-Zones-de-danger-EU-CSV.zip` from
-  [lufop.net's download page](https://lufop.net/zones-de-danger-france-et-europe-asc-et-csv/)
-  in a browser, save it over that path, commit it and run the workflow. The data is
-  CC BY-SA 4.0, so keeping the copy here is allowed. Without a copy, a refused download
-  fails the run and the published files stay as they were.
+  [the download page](https://lufop.net/zones-de-danger-france-et-europe-asc-et-csv/), save it
+  over that path, commit it and run the workflow. The data is CC BY-SA 4.0, so keeping the
+  copy here is allowed. Without a copy, a refused download fails the run and the published
+  files stay as they were. Do not script the sign-in: Lufop has agreed to a person
+  downloading the file, not to an account being driven from a workflow.
 - **A failed run leaves the last files in place.** The script refuses to publish fewer than
   4,000 cameras, or a dataset with no red-light or no fixed cameras. It cannot be tested
   against lufop.net from a laptop either; test it with `--source` and a copy of the archive.
