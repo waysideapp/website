@@ -1,0 +1,60 @@
+{
+  "dataDate": "2026-09-01T03:35:20Z",
+  "checkedAt": "2026-09-27T19:15:01Z",
+  "cameras": 5233,
+  "fixedSpeed": 4220,
+  "redLight": 1013,
+  "speedLimitsMph": {
+    "30": 2597,
+    "40": 882,
+    "50": 370,
+    "60": 244,
+    "70": 118,
+    "80": 1,
+    "100": 2,
+    "120": 6
+  },
+  "files": [
+    {
+      "name": "GBFeuRougeGB.csv",
+      "rows": 1013
+    },
+    {
+      "name": "GBFixeGB100.csv",
+      "rows": 2
+    },
+    {
+      "name": "GBFixeGB40.csv",
+      "rows": 882
+    },
+    {
+      "name": "GBFixeGB80.csv",
+      "rows": 1
+    },
+    {
+      "name": "GBFixeGB50.csv",
+      "rows": 370
+    },
+    {
+      "name": "GBFixeGB60.csv",
+      "rows": 244
+    },
+    {
+      "name": "GBFixeGB70.csv",
+      "rows": 118
+    },
+    {
+      "name": "GBFixeGB120.csv",
+      "rows": 6
+    },
+    {
+      "name": "GBFixeGB30.csv",
+      "rows": 2597
+    }
+  ],
+  "ignoredFiles": [],
+  "sha256": "79bd7eb9bf11364cfb225ffc7dde71f5a03d707bf0ee25bd82ea814ebaf2c4a9",
+  "source": "https://lufop.net/wp-content/plugins/downloads-manager/upload/Lufop-Zones-de-danger-EU-CSV.zip",
+  "fetched": false,
+  "attribution": "© Lufop.net, CC BY-SA 4.0"
+}
